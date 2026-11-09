@@ -1,132 +1,44 @@
-# 👤 Face Recognition Project
+# Face Recognition
 
-<!-- ADD DEMO GIF HERE -->
+Real-time face recognition from a webcam in about 50 lines of Python. Put photos of the
+people you want to recognise in a folder, run the script, and it draws a box and a name
+around every face it sees.
 
-**Real-time face detection and recognition using deep learning. Identify people in video streams or images with high accuracy.**
+## How it works
 
-## The Problem
+1. **Learn the known faces.** Every `.jpg` or `.png` in `known_faces/` is turned into a
+   128-number face encoding with the [`face_recognition`](https://github.com/ageitgey/face_recognition)
+   library (built on dlib). The file name becomes the person's name, so `alice.jpg` is labelled "alice".
+2. **Read the webcam.** Each frame is captured with OpenCV and converted to RGB.
+3. **Find and encode faces.** Every face in the frame is located and encoded the same way.
+4. **Match.** Each face is compared against the known encodings, and the closest one is used if it is
+   within the library's default distance threshold (0.6). Otherwise it is labelled "Unknown".
+5. **Draw.** A green box and the name are drawn on the frame. Press `q` to quit.
 
-Automatic face recognition is essential for security, user authentication, attendance systems, and photo organization. This project demonstrates practical face detection and identification using pre-trained neural networks.
-
-## How It Works
-
-1. **Load Known Faces**: Encode reference images of known people
-2. **Capture Video/Image**: Process input from webcam or file
-3. **Detect Faces**: Locate faces in frame using CNN or Haar cascades
-4. **Extract Features**: Generate 128-dimensional face encodings
-5. **Match & Identify**: Compare unknown faces against known encodings (euclidean distance)
-6. **Display Results**: Annotate video with names and confidence scores
-
-## Tech Stack
-
-- **Python 3.7+**
-- **dlib** – face detection & encoding
-- **face_recognition** – high-level API
-- **OpenCV** – video I/O and visualization
-- **NumPy** – numerical operations
-- **Pillow** – image processing
-
-## Quick Start
+## Run it
 
 ```bash
 git clone https://github.com/georgepol1023/Face-Recognition-Project.git
 cd Face-Recognition-Project
 pip install -r requirements.txt
-python face_recognition.py
+python recognise.py
 ```
 
-**Setup Known Faces:**
-1. Create directory: `known_faces/`
-2. Add subdirectories per person: `known_faces/john/`, `known_faces/jane/`
-3. Add sample images (.jpg, .png)
-4. Run script – it will encode and cache encodings
+Add one clear, front-facing photo per person to `known_faces/`, named after them
+(for example `known_faces/alice.jpg`). Two sample photos are included.
 
-## Customization
-
-```python
-# In face_recognition.py:
-KNOWN_FACES_DIR = 'known_faces'
-UNKNOWN_FACES_DIR = 'unknown_faces'
-TOLERANCE = 0.6  # Lower = stricter matching (0.0-1.0)
-MODEL = 'hog'    # 'hog' (fast) or 'cnn' (accurate)
-```
-
-## Output
-
-- **Live Video**: Detected faces with bounding boxes and names
-- **Confidence Scores**: Distance score for each match
-- **CSV Export**: Save recognized faces with timestamps
-- **Annotated Images**: Save output frames with annotations
-
-## Key Metrics
-
-| Metric | Performance |
-|--------|-------------|
-| Detection Accuracy | ~99% on benchmark datasets |
-| Recognition Accuracy | ~99% (varies with image quality) |
-| Inference Speed (HOG) | ~50-100ms per frame |
-| Inference Speed (CNN) | ~300-500ms per frame |
+`face_recognition` needs dlib. On Windows, `pip install dlib-bin` is the easiest way to get a
+prebuilt copy; on macOS and Linux, `pip install dlib` builds it (CMake required).
 
 ## Limitations
 
-⚠️ **Image Quality**:
-- Requires clear, frontal face views
-- Low resolution images (<50×50px) reduce accuracy
-- Extreme angles/occlusions cause misses
-- Identical twins may be confused
+- One reference photo per person, so side angles, poor lighting and glasses can cause misses.
+- Every frame is processed at full size, so it can be slow on a laptop CPU.
+  Shrinking frames before detection would speed it up.
+- It can be fooled by a photo held up to the camera (no liveness check).
 
-⚠️ **Technical**:
-- Slow on large reference datasets (100+ people)
-- No real-time liveness detection (can be fooled by photos)
-- Struggles with very young/old faces
-- No age/emotion estimation (separate models needed)
+## Built with
 
-## Future Enhancements
+Python, OpenCV, NumPy and `face_recognition` (dlib).
 
-- [ ] Liveness detection (distinguish photos from live faces)
-- [ ] Age/gender/emotion estimation
-- [ ] Multi-face tracking across frames
-- [ ] Mask-aware recognition (COVID era)
-- [ ] GPU acceleration (CUDA)
-- [ ] Web API for remote recognition
-
-## Use Cases
-
-✅ Security access control  
-✅ Attendance tracking  
-✅ Photo album auto-tagging  
-✅ Missing person identification  
-✅ Presentation audience analysis  
-
-## Files
-
-- `face_recognition.py` – Main recognition engine
-- `requirements.txt` – Dependencies
-- `known_faces/` – Reference images (create manually)
-- `output/` – Annotated results
-
-## Performance Tips
-
-- Use HOG model for webcam (faster)
-- Pre-encode known faces and cache
-- Resize input images to 480p for speed
-- Batch process images for efficiency
-
-## Privacy & Ethics
-
-⚠️ This tool processes face data. Please ensure compliance with:
-- GDPR/CCPA regulations
-- Local biometric privacy laws
-- Informed consent from subjects
-- Proper data storage & security
-
-## Author
-
-[George Politis](https://github.com/georgepol1023)
-
-## Resources
-
-- [dlib C++ Library](http://dlib.net/python/index.html)
-- [face_recognition Library](https://github.com/ageitgey/face_recognition)
-- [OpenCV Face Detection](https://docs.opencv.org/master/d7/d8b/tutorial_py_face_detection_in_an_image.html)
-- [LFW Face Database](http://vis-www.cs.umass.edu/lfw/)
+Face data is personal data: only use photos of people who have agreed to it.
